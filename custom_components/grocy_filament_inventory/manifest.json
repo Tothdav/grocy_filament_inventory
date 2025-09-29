@@ -1,0 +1,9 @@
+{
+  "domain": "grocy_filament_inventory",
+  "name": "Grocy Filament Inventory",
+  "version": "0.0.1",
+  "config_flow": true,
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": []
+}

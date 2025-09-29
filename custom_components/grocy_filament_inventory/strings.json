@@ -1,0 +1,22 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Grocy kapcsolat",
+        "description": "Add meg a Grocy szerver URL-jét és API kulcsát.",
+        "data": {
+          "url": "Grocy URL",
+          "api_key": "Grocy API kulcs"
+        }
+      },
+      "find_group": {
+        "title": "Filament csoport keresése",
+        "description": "Ellenőrizzük, hogy létezik-e 'Filament' product group."
+      }
+    },
+    "error": {
+      "cannot_connect": "Nem sikerült csatlakozni a Grocy-hoz.",
+      "no_filament_group": "Nem található 'Filament' nevű product group."
+    }
+  }
+}
