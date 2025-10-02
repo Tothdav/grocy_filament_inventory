@@ -4,7 +4,7 @@ import logging
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.sensor import SensorEntity
-from .const import DOMAIN
+from .const import DOMAIN, DEFAULT_COLOR, FIELD_PRODUCT_ID, FIELD_PRODUCT_KEY, FIELD_PRODUCT_NAME, FIELD_PRODUCT_USERFIELDS, FIELD_FILAMENT_COLOR, FIELD_PRODUCT_AMOUNT_AGGREGATED, FIELD_COLOR
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,9 +17,9 @@ async def async_setup_entry(hass, entry, async_add_entities):
         sensors.append(
             GrocyFilamentSensor(
                 coordinator,
-                filament["product_id"],
-                filament["product"]["name"],
-                filament.get('userfields', {}).get('filament_color', '#FFFFFF') 
+                filament[FIELD_PRODUCT_ID],
+                filament[FIELD_PRODUCT_KEY][FIELD_PRODUCT_NAME],
+                filament.get(FIELD_PRODUCT_USERFIELDS, {}).get(FIELD_FILAMENT_COLOR, DEFAULT_COLOR) 
             )
         )
 
@@ -40,26 +40,22 @@ class GrocyFilamentSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        filament = next((f for f in self.coordinator.data if f["product_id"] == self._filament_id), None)
+        filament = next((f for f in self.coordinator.data if f[FIELD_PRODUCT_ID] == self._filament_id), None)
         if filament:
-            color = filament.get('userfields', {}).get('filament_color', '#FFFFFF')
+            color = filament.get(FIELD_PRODUCT_USERFIELDS, {}).get(FIELD_FILAMENT_COLOR, DEFAULT_COLOR)
             if color is None:
-                return {"color": "#FFFFFF"}
+                return {FIELD_COLOR: DEFAULT_COLOR}
             else:
-                return {"color": color}
-        return {"color": "#FFFFFF"}
-
-        # return {
-        #     "color": self._color if self._color is not None else '#FFFFFF',
-        # }
+                return {FIELD_COLOR: color}
+        return {FIELD_COLOR: DEFAULT_COLOR}
 
     @property
     def native_value(self):
         """Return the current aggregated amount of filament in grams."""
         filament = next(
-            (f for f in self.coordinator.data if f["product_id"] == self._filament_id),
+            (f for f in self.coordinator.data if f[FIELD_PRODUCT_ID] == self._filament_id),
             None,
         )
         if filament:
-            return float(filament.get("amount_aggregated"))
+            return float(filament.get(FIELD_PRODUCT_AMOUNT_AGGREGATED))
         return None

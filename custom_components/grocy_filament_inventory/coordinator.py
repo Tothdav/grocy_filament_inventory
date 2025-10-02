@@ -1,11 +1,14 @@
 from datetime import timedelta
 import logging
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from .api import GrocyApi
+
+from .const import FIELD_PRODUCT_KEY, FIELD_PRODUCT_GROUP_ID, FIELD_PRODUCT_ID, FIELD_PRODUCT_USERFIELDS
 
 _LOGGER = logging.getLogger(__name__)
 
 class GrocyCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass, client, group_id, logger):
+    def __init__(self, hass, client: GrocyApi, group_id, logger):
         super().__init__(
             hass,
             logger,
@@ -22,9 +25,9 @@ class GrocyCoordinator(DataUpdateCoordinator):
 
             filaments = []
             for product_in_stock in products_in_stock:
-                if product_in_stock['product']['product_group_id'] == self.group_id and product_in_stock['product']['parent_product_id'] is None:
-                    userfields = await self.client.async_get_product_userfields(product_in_stock['product_id'])
-                    product_in_stock['userfields'] = userfields
+                if product_in_stock[FIELD_PRODUCT_KEY][FIELD_PRODUCT_GROUP_ID] == self.group_id and product_in_stock[FIELD_PRODUCT_KEY][FIELD_PRODUCT_GROUP_ID] is None:
+                    userfields = await self.client.async_get_product_userfields(product_in_stock[FIELD_PRODUCT_ID])
+                    product_in_stock[FIELD_PRODUCT_USERFIELDS] = userfields
                     filaments.append(product_in_stock)
             return filaments
         except Exception as err:
