@@ -1,0 +1,22 @@
+consume_filament:
+  name: Consume filament
+  description: This will consume the given amount of filament from the selected product
+  fields:
+    entity:
+      name: Filament
+      required: true
+      selector:
+        entity:
+          domain: sensor
+          integration: grocy_filament_inventory
+    amount:
+      name: Amount
+      description: How much to subtract [grams].
+      required: true
+      default: 1
+      example: 10
+      selector:
+        number:
+          min: 0
+          max: 10000
+          unit_of_measurement: g

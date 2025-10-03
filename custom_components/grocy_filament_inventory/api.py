@@ -47,6 +47,25 @@ class GrocyApi:
             async with self._session.get(url, headers=headers) as resp:
                 resp.raise_for_status()
                 return await resp.json()
+            
+    async def async_consume_product(self, product_id: int, amount: float):
+        headers = {self.GROCY_API_KEY_STRING: self._api_key}
+
+        # await self.async_get_child_products(product_group_id, product_id)
+        url = f"{self._url}/{self.GROCY_API_URL_SUFFIX}/stock/products/{product_id}/consume"
+
+        payload = {
+            "amount": amount,
+            "allow_subproduct_substitution": True
+        }
+
+        _LOGGER.debug("Consuming product: %s (%f gram)", product_id, amount)
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=payload, headers=headers) as resp:
+                if resp.status != 200:
+                    text = await resp.text()
+                    raise Exception(f"Failed to consume product: {resp.status} - {text}")
+                return await resp.json()
 
     async def async_get_products(self, product_group_id):
         """Fetches all the products with the given product group id"""
@@ -56,6 +75,6 @@ class GrocyApi:
             async with self._session.get(url, headers=headers) as resp:
                 resp.raise_for_status()
                 return await resp.json()
-
+    
     async def async_close(self):
         await self._session.close()
